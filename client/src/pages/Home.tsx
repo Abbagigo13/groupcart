@@ -1,25 +1,35 @@
-import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { ArrowRight, Check, Code2, CreditCard, Database, FileText, LockKeyhole, Package, ShieldCheck, Sparkles, Users } from "lucide-react";
+import { useLocation } from "wouter";
+import { BrandMark, CopyCode, FAQItem, FeatureCard, OrderHeroCard, SectionHeading, ThresholdRibbon } from "@/components/groupcart";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Workflow, Frontend Best Practices, Design Guide and Common Pitfalls
- */
+const steps = [
+  ["01", "Create one clear order", "An organizer adds one product, one supplier, quantity thresholds, a deadline, and a pickup plan."],
+  ["02", "Let the circle join", "Members choose a quantity and watch the group move toward the next price."],
+  ["03", "Record the payment state", "Pi is the community payment rail. The app keeps submitted and verified states separate."],
+  ["04", "Pick up together", "Everyone sees the same pickup terms and the organizer closes the order when the handoff is done."],
+];
+
 export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const [, navigate] = useLocation();
+  return <div className="public-site">
+    <header className="public-nav"><BrandMark /><nav className="hidden items-center gap-7 md:flex"><a href="#how-it-works">How it works</a><a href="#features">Features</a><a href="#architecture">Architecture</a><a href="#faq">FAQ</a></nav><button className="outline-button" onClick={() => navigate("/app")}>Open demo <ArrowRight size={15} /></button></header>
+    <main>
+      <section className="hero-section"><div className="container hero-grid"><div className="hero-copy"><div className="soft-badge"><Sparkles size={14} /> A clearer way to buy together</div><h1 className="display-xl mt-6">Buy together.<br /><span>Know where it stands.</span></h1><p className="hero-lede">GroupCart turns a messy community group order into one shared, Pi-powered commitment. See the quantity, the price, the payment state, and the pickup plan at a glance.</p><div className="mt-8 flex flex-wrap gap-3"><button className="primary-button" onClick={() => navigate("/app")}>Explore the live demo <ArrowRight size={17} /></button><a href="#how-it-works" className="outline-button">See how it works</a></div><div className="mt-8 flex items-center gap-3 text-sm font-semibold text-[#77738C]"><div className="flex -space-x-2"><span className="member-avatar bg-[#DDF6EA]">AM</span><span className="member-avatar bg-[#F0ECFF]">KO</span><span className="member-avatar bg-[#FDE3D9]">SA</span></div><span>Built for real communities, not empty marketplaces.</span></div></div><div className="hero-preview"><OrderHeroCard onOpen={() => navigate("/app/order/cables-apr-26")} /><div className="floating-clay floating-mint"><Users size={16} /><span>23 members joined</span></div><div className="floating-clay floating-coral"><Check size={16} /><span>Payment states stay clear</span></div></div></div></section>
 
-  return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
-    </div>
-  );
+      <section id="overview" className="section-block"><div className="container"><SectionHeading eyebrow="Overview" title="The group order is the product." body="GroupCart starts with the one moment communities already have: someone says, “Who else wants one?” We give that moment a shared source of truth." /><div className="problem-grid"><div className="problem-card problem-before"><div className="eyebrow">Before GroupCart</div><h3>Chat threads, screenshots, and guesswork.</h3><p>Members ask for the current price. Organizers calculate quantities by hand. Payment references disappear inside a busy conversation.</p><div className="chat-stack"><span>“How many have joined?”</span><span>“What is the latest price?”</span><span>“Did you receive my screenshot?”</span></div></div><div className="problem-card problem-after"><div className="eyebrow">With GroupCart</div><h3>One shared order, one clear next action.</h3><p>Everyone sees the same threshold, price, payment status, and pickup terms. The organizer stays in control without being the spreadsheet.</p><div className="mini-stat-row"><div><strong>72</strong><span>committed</span></div><div><strong>π 2.40</strong><span>current price</span></div><div><strong>8</strong><span>to next tier</span></div></div></div></div></div></section>
+
+      <section id="how-it-works" className="section-block section-soft"><div className="container"><SectionHeading eyebrow="How it works" title="A simple order story, from first quantity to pickup." /><div className="steps-grid">{steps.map(([number, title, body]) => <div className="step-card" key={number}><div className="step-number">{number}</div><h3>{title}</h3><p>{body}</p></div>)}</div></div></section>
+
+      <section id="features" className="section-block"><div className="container"><SectionHeading eyebrow="Features" title="Soft surfaces. Serious coordination." body="The UI is friendly because group buying should feel communal. The state language is precise because money and pickup plans deserve clarity." /><div className="features-grid"><FeatureCard tint="lavender" icon={<Package size={20} />} title="Threshold pricing" body="Make the next better price visible and show exactly how many units the group needs to unlock it." /><FeatureCard tint="mint" icon={<Users size={20} />} title="Member commitments" body="Let each person choose a quantity, see their place in the group, and avoid duplicate or hidden commitments." /><FeatureCard tint="coral" icon={<CreditCard size={20} />} title="Honest Pi states" body="Submitted, verified, and needs review are different states. GroupCart never blurs the line." /><FeatureCard tint="lavender" icon={<ShieldCheck size={20} />} title="Pickup clarity" body="Keep location, window, and readiness in the same order story so the final handoff is easy to follow." /></div></div></section>
+
+      <section id="architecture" className="section-block section-ink"><div className="container architecture-grid"><div><div className="eyebrow eyebrow-light">Architecture</div><h2 className="display-md mt-3 text-white">A small, honest stack for a real pilot.</h2><p className="mt-4 max-w-lg text-[15px] leading-7 text-white/65">The browser owns the experience. tRPC keeps the client and server typed. Drizzle persists the order state. Pi sits at the payment boundary, never as an invisible custody layer.</p><div className="mt-7 flex flex-wrap gap-2"><span className="dark-chip"><Code2 size={14} /> React + tRPC</span><span className="dark-chip"><Database size={14} /> Drizzle + MySQL</span><span className="dark-chip"><LockKeyhole size={14} /> Non-custodial by design</span></div></div><div className="architecture-stack"><div className="arch-layer arch-browser"><span>01</span><strong>Pi Browser</strong><small>Mobile-first web app</small></div><div className="arch-arrow">↓</div><div className="arch-layer arch-api"><span>02</span><strong>Typed application API</strong><small>Order, member, and payment states</small></div><div className="arch-arrow">↓</div><div className="arch-layer arch-db"><span>03</span><strong>Managed database</strong><small>Communities, commitments, events</small></div></div></div></section>
+
+      <section id="documentation" className="section-block"><div className="container"><SectionHeading eyebrow="Documentation" title="Everything needed to build the pilot without guessing." /><div className="docs-grid"><div className="doc-panel"><div className="eyebrow">Getting started</div><h3>Run the product locally.</h3><p>Clone the project, install dependencies, start the development server, then open the seeded order flow.</p><CopyCode>pnpm dev</CopyCode><CopyCode>pnpm check</CopyCode><CopyCode>pnpm build</CopyCode></div><div className="doc-panel"><div className="eyebrow">API reference</div><h3>Typed by default.</h3><p>Procedures keep order reads, joins, lifecycle actions, and payment records explicit and reviewable.</p><div className="api-list"><div><code>order.listActive</code><span>GET · active community order</span></div><div><code>order.join</code><span>MUTATION · commit a quantity</span></div><div><code>order.submitPayment</code><span>MUTATION · record a reference</span></div></div></div></div></div></section>
+
+      <section id="faq" className="section-block section-soft"><div className="container narrow"><SectionHeading eyebrow="FAQ" title="Clear answers for a careful first pilot." /><div className="faq-stack"><FAQItem question="Does GroupCart hold Pi or provide escrow?" answer="No. The first release is non-custodial. The app records and displays payment states and does not claim to hold funds or guarantee refunds." /><FAQItem question="Why start with one community?" answer="Because a group-buying product is only useful when people already share a supplier, product, and pickup context. A real pilot is more valuable than a global marketplace with no liquidity." /><FAQItem question="What does submitted payment mean?" answer="It means the payment reference or supported payment action has been recorded. It is not the same as verified. The UI keeps those states separate." /><FAQItem question="Can the app support delivery later?" answer="Possibly, but delivery introduces logistics, disputes, and additional trust work. The first release stays pickup-based so the order state remains honest." /></div></div></section>
+
+      <section className="section-block cta-section"><div className="container"><div className="cta-card"><div><div className="eyebrow">Start with one order</div><h2 className="display-md mt-2">Make the next purchase easier for your circle.</h2><p className="mt-3 max-w-xl text-[15px] leading-7 text-[#77738C]">Explore the seeded Lagos Makers Circle demo, then turn the same flow into a real pilot with one organizer and one supplier.</p></div><button className="primary-button shrink-0" onClick={() => navigate("/app")}>Open GroupCart <ArrowRight size={17} /></button></div></div></section>
+    </main>
+    <footer className="public-footer"><div className="container flex flex-col justify-between gap-4 py-8 sm:flex-row sm:items-center"><BrandMark /><span>GroupCart · Buy together. Know where it stands.</span></div></footer>
+  </div>;
 }

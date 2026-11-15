@@ -1,0 +1,1 @@
+{"routes":[{"path":"/","title":"GroupCart overview"},{"path":"/app","title":"GroupCart dashboard"},{"path":"/app/order/:id","title":"GroupCart order"},{"path":"/app/create","title":"Create group order"},{"path":"/404","title":"Not found"}]}
