@@ -6,7 +6,10 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { startLogin } from "./const";
+import { getPiAccessToken, initPiSdk } from "./lib/pi";
 import "./index.css";
+
+initPiSdk();
 
 const queryClient = new QueryClient();
 
@@ -60,7 +63,8 @@ const trpcClient = trpc.createClient({
         } catch {
           // sessionStorage unavailable
         }
-        return {};
+        const piToken = getPiAccessToken();
+        return piToken ? { Authorization: `Bearer ${piToken}` } : {};
       },
       fetch(input, init) {
         return globalThis.fetch(input, {

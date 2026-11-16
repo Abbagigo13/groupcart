@@ -17,6 +17,9 @@ Members may access public order information and their own membership/payment rec
 - Keep payment state explicit: not started, pending, submitted, verified, or needs review.
 - Do not hold Pi, implement escrow, promise automatic refunds, or imply custody in the MVP.
 - Treat a transaction reference supplied by a user as unverified until the supported server-side verification step succeeds.
+- Use the official Pi Browser SDK for `Pi.authenticate` and `Pi.createPayment`; verify access tokens with Pi `GET /v2/me` before treating a Pioneer as authenticated.
+- For User-to-App payments, approve only after validating the Pi payment's user, metadata, order state, and membership; mark a payment verified only after the server receives a successful Pi `/complete` response for the real `paymentId` and `txid`.
+- Keep Testnet/Sandbox and Mainnet configuration explicit and aligned. Never expose `PI_API_KEY` in browser code or `VITE_` variables.
 - Do not log sensitive payment payloads or private credentials.
 
 ## Input and output safety

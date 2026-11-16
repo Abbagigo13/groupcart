@@ -33,11 +33,15 @@
 - tRPC procedures validate inputs, enforce role permissions, and return typed data for active orders, order details, joins, lifecycle changes, and payment references.
 - The pilot seed path is idempotent and does not overwrite real user changes.
 
-## Outcome 6 — Pi payment integration boundary — partial
+## Outcome 6 — Pi payment integration boundary — complete for code and server integration; Pi Browser E2E pending
 
-- Supported Pi authentication/payment capabilities are integrated where available.
+- The official Pi SDK is loaded and initialized with explicit Testnet/Sandbox or Mainnet configuration; Pi authentication requests `username` and `payments` scopes and sends the access token to server-side `/v2/me` verification.
+- User-to-App payments use the official approval → blockchain → completion lifecycle, including incomplete-payment recovery, metadata/order/member validation, idempotent records, real `paymentId`/`txid` forwarding, and verified-only payment status.
+- The Pi Server API Key is configured as a server-only project secret for Testnet; it is not exposed in client code.
 - A submitted transaction reference remains submitted until a supported verification step confirms it.
 - The app never collects passphrases, private keys, or seed phrases and never claims to hold funds or provide escrow.
+
+- Remaining external step: open GroupCart in the Pi Testnet/Sandbox, authenticate, join the seeded order, and complete one Test-Pi payment end to end.
 
 ## Outcome 7 — Quality and checkpoint — partial
 

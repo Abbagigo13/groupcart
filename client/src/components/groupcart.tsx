@@ -6,6 +6,7 @@ import {
   Clock3,
   Copy,
   CreditCard,
+  LogIn,
   MapPin,
   Package,
   ShieldCheck,
@@ -13,6 +14,9 @@ import {
   Users,
 } from "lucide-react";
 import type { ReactNode } from "react";
+import { useState } from "react";
+import { toast } from "sonner";
+import { authenticateWithPi } from "@/lib/pi";
 
 export type PaymentStatus = "not_started" | "submitted" | "verified" | "needs_review";
 
@@ -148,9 +152,26 @@ export function CopyCode({ children }: { children: string }) {
   return <div className="code-row"><code>{children}</code><button aria-label="Copy code" className="icon-button"><Copy size={15} /></button></div>;
 }
 
+export function PiSignInButton() {
+  const [busy, setBusy] = useState(false);
+  const signIn = async () => {
+    setBusy(true);
+    try {
+      const auth = await authenticateWithPi();
+      toast.success(`Signed in as @${auth.user.username}`);
+      window.location.reload();
+    } catch (error) {
+      toast.error("Pi sign-in was not completed", { description: error instanceof Error ? error.message : "Try again inside Pi Browser." });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return <button className="primary-button w-full" onClick={() => void signIn()} disabled={busy}><LogIn size={15} /> {busy ? "Connecting to Pi…" : "Sign in with Pi"}</button>;
+}
+
 export function AppNav({ active = "Overview" }: { active?: string }) {
   const links = ["Overview", "Orders", "Members", "Settings"];
-  return <><aside className="hidden lg:flex lg:w-[224px] lg:flex-col lg:border-r lg:border-[#E7E3F2] lg:bg-white/65 lg:px-5 lg:py-6"><BrandMark /><div className="mt-12 space-y-1">{links.map(link => <a href={link === "Overview" ? "/app" : `#${link.toLowerCase()}`} className={`nav-link ${active === link ? "nav-link-active" : ""}`} key={link}>{link === "Overview" ? <Sparkles size={17} /> : link === "Orders" ? <Package size={17} /> : link === "Members" ? <Users size={17} /> : <ShieldCheck size={17} />}{link}</a>)}</div><div className="mt-auto clay-card clay-card-mint p-4"><div className="text-xs font-black uppercase tracking-[0.12em] text-[#4E765B]">Pilot community</div><div className="mt-2 text-sm font-bold text-[#242238]">Lagos Makers Circle</div><div className="mt-1 text-xs leading-5 text-[#77738C]">One trusted group. One clear order.</div></div></aside><header className="flex items-center justify-between border-b border-[#E7E3F2] bg-white/75 px-4 py-4 lg:hidden"><BrandMark /><button className="soft-badge">Lagos Circle</button></header></>;
+  return <><aside className="hidden lg:flex lg:w-[224px] lg:flex-col lg:border-r lg:border-[#E7E3F2] lg:bg-white/65 lg:px-5 lg:py-6"><BrandMark /><div className="mt-8"><PiSignInButton /></div><div className="mt-8 space-y-1">{links.map(link => <a href={link === "Overview" ? "/app" : `#${link.toLowerCase()}`} className={`nav-link ${active === link ? "nav-link-active" : ""}`} key={link}>{link === "Overview" ? <Sparkles size={17} /> : link === "Orders" ? <Package size={17} /> : link === "Members" ? <Users size={17} /> : <ShieldCheck size={17} />}{link}</a>)}</div><div className="mt-auto clay-card clay-card-mint p-4"><div className="text-xs font-black uppercase tracking-[0.12em] text-[#4E765B]">Pilot community</div><div className="mt-2 text-sm font-bold text-[#242238]">Lagos Makers Circle</div><div className="mt-1 text-xs leading-5 text-[#77738C]">One trusted group. One clear order.</div></div></aside><header className="flex items-center justify-between border-b border-[#E7E3F2] bg-white/75 px-4 py-4 lg:hidden"><BrandMark /><PiSignInButton /></header></>;
 }
 
 export function MobileTabs() {
@@ -166,8 +187,8 @@ export function Timeline() {
   return <div className="space-y-5">{events.map(([date, title, body], index) => <div className="flex gap-3" key={title}><div className="flex w-10 flex-col items-center"><div className={`timeline-dot ${index === 0 ? "timeline-dot-active" : ""}`} />{index < events.length - 1 && <div className="timeline-line" />}</div><div className="pb-2"><div className="eyebrow">{date}</div><div className="mt-1 text-sm font-extrabold text-[#242238]">{title}</div><div className="mt-1 text-sm leading-6 text-[#77738C]">{body}</div></div></div>)}</div>;
 }
 
-export function PaymentCard({ status = "submitted" as PaymentStatus, amountPi, transactionReference, onAmountChange, onReferenceChange, onAction, submitting }: { status?: PaymentStatus; amountPi?: string; transactionReference?: string; onAmountChange?: (value: string) => void; onReferenceChange?: (value: string) => void; onAction?: () => void; submitting?: boolean }) {
-  return <div className="clay-card p-5"><div className="flex items-start justify-between gap-3"><div><div className="eyebrow">Your payment</div><div className="mt-1 text-xl font-black tracking-[-0.04em] text-[#242238]">π {amountPi ?? (demoOrder.currentPrice * 8).toFixed(2)}</div></div><div className="rounded-2xl bg-[#F0ECFF] p-3 text-[#5F4BC2]"><CreditCard size={20} /></div></div><div className="mt-4"><StatusPill status={status} /></div><p className="mt-3 text-sm leading-6 text-[#77738C]">Submitted means the reference is recorded. It becomes verified only after the supported payment check or organizer review.</p>{status === "not_started" && <div className="mt-4 space-y-3"><label className="field-label">Amount in Pi<input className="field-input" inputMode="decimal" value={amountPi ?? ""} onChange={event => onAmountChange?.(event.target.value)} placeholder="19.20" /></label><label className="field-label">Pi transaction reference<input className="field-input" value={transactionReference ?? ""} onChange={event => onReferenceChange?.(event.target.value)} placeholder="Paste the reference from Pi" /></label><button onClick={onAction} className="primary-button mt-1 w-full" disabled={submitting}>{submitting ? "Submitting…" : "Submit payment reference"} <ArrowRight size={16} /></button><div className="flex gap-2 rounded-2xl bg-[#F0ECFF] p-3 text-xs leading-5 text-[#77738C]"><ShieldCheck size={15} className="mt-0.5 shrink-0 text-[#5F4BC2]" /><span>Only submit a transaction reference. GroupCart never asks for a wallet passphrase or private key.</span></div></div>}</div>;
+export function PaymentCard({ status = "submitted" as PaymentStatus, amountPi, transactionReference, onAmountChange, onReferenceChange, onAction, onPiPay, submitting, piBusy }: { status?: PaymentStatus; amountPi?: string; transactionReference?: string; onAmountChange?: (value: string) => void; onReferenceChange?: (value: string) => void; onAction?: () => void; onPiPay?: () => void; submitting?: boolean; piBusy?: boolean }) {
+  return <div className="clay-card p-5"><div className="flex items-start justify-between gap-3"><div><div className="eyebrow">Your payment</div><div className="mt-1 text-xl font-black tracking-[-0.04em] text-[#242238]">π {amountPi ?? (demoOrder.currentPrice * 8).toFixed(2)}</div></div><div className="rounded-2xl bg-[#F0ECFF] p-3 text-[#5F4BC2]"><CreditCard size={20} /></div></div><div className="mt-4"><StatusPill status={status} /></div><p className="mt-3 text-sm leading-6 text-[#77738C]">Pi verifies the blockchain transaction. GroupCart marks this payment complete only after the server confirms Pi completion.</p>{status === "not_started" && <div className="mt-4 space-y-3">{onPiPay && <button onClick={onPiPay} className="primary-button w-full" disabled={piBusy}>{piBusy ? "Opening Pi payment…" : "Pay with Pi"} <ArrowRight size={16} /></button>}<div className="eyebrow text-center">or submit a reference for organizer review</div><label className="field-label">Amount in Pi<input className="field-input" inputMode="decimal" value={amountPi ?? ""} onChange={event => onAmountChange?.(event.target.value)} placeholder="19.20" /></label><label className="field-label">Pi transaction reference<input className="field-input" value={transactionReference ?? ""} onChange={event => onReferenceChange?.(event.target.value)} placeholder="Paste the reference from Pi" /></label><button onClick={onAction} className="outline-button mt-1 w-full" disabled={submitting}>{submitting ? "Submitting…" : "Submit payment reference"} <ArrowRight size={16} /></button><div className="flex gap-2 rounded-2xl bg-[#F0ECFF] p-3 text-xs leading-5 text-[#77738C]"><ShieldCheck size={15} className="mt-0.5 shrink-0 text-[#5F4BC2]" /><span>Only submit a transaction reference. GroupCart never asks for a wallet passphrase or private key.</span></div></div>}</div>;
 }
 
 export function EmptyState({ title, body, action }: { title: string; body: string; action?: ReactNode }) { return <div className="empty-state"><div className="empty-icon"><Package size={22} /></div><h3 className="mt-4 text-lg font-black text-[#242238]">{title}</h3><p className="mt-2 max-w-sm text-sm leading-6 text-[#77738C]">{body}</p>{action && <div className="mt-5">{action}</div>}</div>; }

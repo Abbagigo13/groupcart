@@ -59,6 +59,12 @@ export async function getUserByOpenId(openId: string) {
   return result[0];
 }
 
+export async function upsertPiUser(piUser: { uid: string; username?: string }) {
+  const openId = `pi:${piUser.uid}`;
+  await upsertUser({ openId, name: piUser.username ?? null, loginMethod: "pi", role: "user" });
+  return getUserByOpenId(openId);
+}
+
 export async function getCurrentCommunity(userId: number) {
   const db = await getDb();
   if (!db) return undefined;
